@@ -30,6 +30,8 @@ Resources:
       FunctionName: !Sub 'awscodestar-${ProjectId}-lambda-HelloWorld'
       Handler: index.handler
       Runtime: python3.7
+      Timeout: 900
+      MemorySize: 512
       Role:
         Fn::GetAtt:
         - LambdaExecutionRole
@@ -59,4 +61,31 @@ Resources:
       Path: /
       ManagedPolicyArns:
         - !Sub 'arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+        - 'arn:aws:iam::aws:policy/AmazonSESFullAccess'
+        - 'arn:aws:iam::678451980605:policy/dart-moac-s3-full'
       PermissionsBoundary: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/CodeStar_${ProjectId}_PermissionsBoundary'
+
+  ScheduledRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "ScheduledRule"
+      ScheduleExpression: "cron(30 13 ? * TUE *)"
+      State: "ENABLED"
+      Targets:
+        - Arn:
+            Fn::GetAtt:
+              - "HelloWorld"
+              - "Arn"
+          Id: "TargetFunctionV1"
+
+  PermissionForEventsToInvokeLambda:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName:
+        Ref: "HelloWorld"
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn:
+        Fn::GetAtt:
+          - "ScheduledRule"
+          - "Arn"
