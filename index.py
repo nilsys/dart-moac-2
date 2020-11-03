@@ -421,6 +421,10 @@ def sendAWSMailAttachment(recipeint, subject, body_text, attachPath1, attachPath
     # This address must be verified with Amazon SES.
     SENDER = "dartconsultants.hyd@gmail.com"
 
+    print("ttach path are {0} {1}".format(attachPath1,attachPath2))
+
+    print(body_text)
+
     # Replace recipient@example.com with a "To" address. If your account
     # is still in the sandbox, this address must be verified.
     RECIPIENT = recipeint
@@ -509,8 +513,8 @@ def sendAWSMailAttachment(recipeint, subject, body_text, attachPath1, attachPath
             # ConfigurationSetName=CONFIGURATION_SET
         )
     # Display an error if something goes wrong.
-    except:
-        print("Email errored")
+    except Exception as e:
+        print(e)
     else:
         print("Email sent! Message ID:"),
         print(response['MessageId'])
