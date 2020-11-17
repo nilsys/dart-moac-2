@@ -582,7 +582,8 @@ def handler(event, context):
         if exitCost > 0:
             newBuy, newNet,newBuyPrintOutout = portfolioRebalance(portfolioValue,currentInvEligible, currentPortfolio, exitCost)
             currentPortfolio = currentPortfolio[~currentPortfolio['Stock'].isin(exitStocks['Stock'])]
-            currentPortfolio = currentPortfolio.append(newBuy.loc[:, currentPortfolio.columns])
+            # currentPortfolio = currentPortfolio.append(newBuy.loc[:, currentPortfolio.columns])
+            currentPortfolio = currentPortfolio.append(newBuy.reindex(columns = currentPortfolio.columns))
 
 
 
