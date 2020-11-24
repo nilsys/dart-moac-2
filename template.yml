@@ -77,6 +77,7 @@ Resources:
               - "HelloWorld"
               - "Arn"
           Id: "TargetFunctionV1"
+          Input: "{\"cx_mail_list\": [\"dartconsultants.hyd@gmail.com\",\"sridharanbharath@gmail.com\"]}"
 
   PermissionForEventsToInvokeLambda:
     Type: AWS::Lambda::Permission
