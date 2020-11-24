@@ -530,7 +530,7 @@ def sendAWSMailAttachment(mailtype, subject, body_text,
         print(e)
     else:
         print("Email sent! Message ID:"),
-        print(cx_customer_list)
+#         print(cx_customer_list)
         print(response['MessageId'])
 
 def handler(event, context):
