@@ -416,7 +416,22 @@ def getMailBody(portfolioValue,exitStocks,exitCost,newBuyPrintOutout,newNet,posi
 
     return BODY_TEXT
 
-def sendAWSMailAttachment(recipeint, subject, body_text, attachPath1, attachPath2):
+# def sendAWSMailAttachment(recipeint, subject, body_text, attachPath1, attachPath1):
+def sendAWSMailAttachment(mailtype, subject, body_text,
+                          attachPath1,attachPath2,cx_customer_list=["dartconsultants.hyd@gmail.com"]):
+    # Replace sender@example.com with your "From" address.
+    # This address must be verified with Amazon SES.
+    DestinationDict={}
+    RECIPIENT=[]
+
+    if mailtype == 'ADMIN':
+        RECIPIENT = ["dartconsultants.hyd@gmail.com"]
+        DestinationDict = {'ToAddresses': RECIPIENT}
+
+    elif mailtype == 'CUSTOMER':
+        RECIPIENT = ["dartconsultants.hyd@gmail.com"]
+        RECIPIENTBCC = cx_customer_list
+        DestinationDict = {'ToAddresses': RECIPIENT, 'BccAddresses': RECIPIENTBCC}
     # Replace sender@example.com with your "From" address.
     # This address must be verified with Amazon SES.
     SENDER = "dartconsultants.hyd@gmail.com"
@@ -427,7 +442,7 @@ def sendAWSMailAttachment(recipeint, subject, body_text, attachPath1, attachPath
 
     # Replace recipient@example.com with a "To" address. If your account
     # is still in the sandbox, this address must be verified.
-    RECIPIENT = recipeint
+
 
     # Specify a configuration set. If you do not want to use a configuration
     # set, comment the following variable, and the
@@ -504,9 +519,7 @@ def sendAWSMailAttachment(recipeint, subject, body_text, attachPath1, attachPath
         # Provide the contents of the email.
         response = client.send_raw_email(
             Source=SENDER,
-            Destinations=[
-                RECIPIENT
-            ],
+            Destinations=DestinationDict,
             RawMessage={
                 'Data': msg.as_string(),
             }
@@ -517,8 +530,8 @@ def sendAWSMailAttachment(recipeint, subject, body_text, attachPath1, attachPath
         print(e)
     else:
         print("Email sent! Message ID:"),
+        print(cx_customer_list)
         print(response['MessageId'])
-
 
 def handler(event, context):
     # This will use the already data generated which has every weekly list
@@ -527,7 +540,7 @@ def handler(event, context):
     # Source data on Dart drive - SOTM_BackTest
     # Will go from week 20 when
     #TODO For furutre loooking need to use the index list Plus portfolio holding as the universe for currentRanking
-
+    cx_mail_list = event['cx_mail_list']
 
     runReport = 'weekly'
     takeBackupS3(runReport)
@@ -627,8 +640,9 @@ def handler(event, context):
         BODY_TEXT = getMailBody(portfolioValue,exitStocks,exitCost,newBuyPrintOutout,newNet,positionRebalanceTrades,positionRebalanceNet,currentPortfolio,actualNetToReallocateRatio)
         SUBJECT = "{0} MoAC report".format(runReport)
 
-        sendAWSMailAttachment('dartconsultants.hyd@gmail.com', SUBJECT, BODY_TEXT, tmpPortfolioPath, tmpRankingPath)
-
+        # sendAWSMailAttachment('dartconsultants.hyd@gmail.com', SUBJECT, BODY_TEXT, tmpPortfolioPath, tmpRankingPath)
+        sendAWSMailAttachment('CUSTOMER', SUBJECT, BODY_TEXT, tmpPortfolioPath, tmpRankingPath, cx_mail_list)
+        # sendAWSMailAttachment('CUSTOMER', SUBJECT, BODY_TEXT, tmpPath, cx_mail_list)
         #TOdO overwrite current portfolio and create a date based current porfolio. Also may be print past portfolio as is
         #Todo print current rank and have past rank
         #TODO top absolut movers
